@@ -95,12 +95,11 @@ body{background:#181614;color:#F2E8D5;font-family:'IBM Plex Mono',monospace;min-
 <div class="tagline">from Pixel Basement</div>
 <h1 class="headline">Grain is not noise.<br>It is <em>texture.</em></h1>
 <p class="description">Grain &amp; Grit Machine is a procedural grain renderer. Physically modelled from real emulsion science. Coming to your NLE as a plugin.</p>
-<form class="form-row" action="https://app.kit.com/forms/9342087/subscriptions" method="post" data-sv-form="9342087" data-uid="d7f07bfeec">
-<input type="email" name="email_address" placeholder="Your email" required>
+<form class="form-row" onsubmit="event.preventDefault()">
+<input type="email" placeholder="Your email" required>
 <button type="submit">Join waitlist</button>
 </form>
-<p class="note form-success" style="display:none;color:#C8903A">You're on the list. Check your email.</p>
-<p class="note form-default">Early access coming soon</p>
+<p class="note">Early access coming soon</p>
 </div>
 <div class="card-footer">
 <div class="status-badge"><div class="dot"></div><span>Waitlist open</span></div>
@@ -108,30 +107,6 @@ body{background:#181614;color:#F2E8D5;font-family:'IBM Plex Mono',monospace;min-
 </div>
 </div>
 
-<script>
-document.querySelector('form[data-sv-form]').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  const form = e.target;
-  const btn = form.querySelector('button');
-  const email = form.querySelector('input[name="email_address"]').value;
-  btn.textContent = '...';
-  btn.disabled = true;
-  try {
-    await fetch(form.action, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: 'email_address=' + encodeURIComponent(email),
-      mode: 'no-cors'
-    });
-    form.style.display = 'none';
-    document.querySelector('.form-default').style.display = 'none';
-    document.querySelector('.form-success').style.display = 'block';
-  } catch(err) {
-    btn.textContent = 'Try again';
-    btn.disabled = false;
-  }
-});
-</script>
 <script>
 const canvas = document.getElementById('grainCanvas');
 const ctx = canvas.getContext('2d');
