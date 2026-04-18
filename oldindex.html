@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Film Grain Plugin — Grain & Grit Machine</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{height:100%}
+body{background:#181614;color:#F2E8D5;font-family:'IBM Plex Mono',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;position:relative}
+
+.corner{position:fixed;z-index:10;pointer-events:none}
+.corner svg{width:40px;height:40px}
+.c-tl{top:24px;left:24px}
+.c-tr{top:24px;right:24px;transform:scaleX(-1)}
+.c-bl{bottom:24px;left:24px;transform:scaleY(-1)}
+.c-br{bottom:24px;right:24px;transform:scale(-1)}
+
+.top-line{position:fixed;top:28px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#38322B;z-index:10;pointer-events:none}
+.bottom-line{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#38322B;z-index:10;pointer-events:none}
+
+.content{position:relative;z-index:5;display:flex;flex-direction:column;align-items:center;text-align:center;width:100%;padding:0 32px}
+
+.above{margin-bottom:40px;opacity:0;animation:fadeIn 0.8s ease forwards;animation-delay:0.2s}
+.brand{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#504538;margin-bottom:16px}
+.title{font-family:'DM Mono',monospace;font-size:clamp(28px,6vw,72px);font-weight:500;letter-spacing:-1px;line-height:1.1}
+.title em{font-style:normal;color:#C8903A}
+
+.grain-box{width:min(85vw, 700px);height:100px;position:relative;margin-bottom:40px;opacity:0;animation:fadeIn 0.8s ease forwards;animation-delay:0.6s;border:1px solid #38322B}
+.grain-canvas{width:100%;height:100%;display:block}
+.grain-label-left{position:absolute;left:-28px;top:50%;transform:translateY(-50%) rotate(-90deg);font-size:7px;letter-spacing:2px;text-transform:uppercase;color:#504538;white-space:nowrap}
+.grain-label-right{position:absolute;right:-20px;top:50%;transform:translateY(-50%) rotate(90deg);font-size:7px;letter-spacing:2px;text-transform:uppercase;color:#504538;white-space:nowrap}
+
+.below{opacity:0;animation:fadeIn 0.8s ease forwards;animation-delay:1.0s}
+.sub{font-size:13px;color:#8A7A6A;letter-spacing:0.5px;margin-bottom:32px;line-height:1.6;max-width:440px}
+.form-row{display:flex;gap:2px;justify-content:center;margin-bottom:12px}
+.form-row input[type="email"]{background:#1f1c19;border:1px solid #504538;color:#F2E8D5;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:1px;padding:14px 20px;width:300px;outline:none;transition:border-color 0.1s}
+.form-row input[type="email"]:focus{border-color:#C8903A}
+.form-row input[type="email"]::placeholder{color:#504538;font-size:10px;letter-spacing:2px;text-transform:uppercase}
+.form-row button{background:#C8903A;border:none;color:#181614;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;padding:14px 24px;cursor:pointer;font-weight:500;transition:background 0.1s}
+.form-row button:hover{background:#d9a44a}
+.note{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#38322B}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:500px){
+.form-row{flex-direction:column;align-items:center}
+.form-row input[type="email"]{width:100%;max-width:300px}
+.grain-label-left,.grain-label-right{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="corner c-tl"><svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M 2 2 L 2 22" stroke="#F2E8D5" stroke-width="1" opacity="0.4"/><path d="M 2 2 L 22 2" stroke="#F2E8D5" stroke-width="1" opacity="0.4"/></svg></div>
+<div class="corner c-tr"><svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M 2 2 L 2 22" stroke="#F2E8D5" stroke-width="1" opacity="0.4"/><path d="M 2 2 L 22 2" stroke="#F2E8D5" stroke-width="1" opacity="0.4"/></svg></div>
+<div class="corner c-bl"><svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M 2 2 L 2 22" stroke="#F2E8D5" stroke-width="1" opacity="0.4"/><path d="M 2 2 L 22 2" stroke="#F2E8D5" stroke-width="1" opacity="0.4"/></svg></div>
+<div class="corner c-br"><svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M 2 2 L 2 22" stroke="#F2E8D5" stroke-width="1" opacity="0.4"/><path d="M 2 2 L 22 2" stroke="#F2E8D5" stroke-width="1" opacity="0.4"/></svg></div>
+
+<div class="top-line">Pixel Basement · Grain &amp; Grit Machine</div>
+<div class="bottom-line">filmgrainplugin.com</div>
+
+<div class="content">
+<div class="above">
+<div class="brand">A precision instrument</div>
+<h1 class="title">Grain is not noise.<br>It is <em>texture.</em></h1>
+</div>
+
+<div class="grain-box">
+<canvas class="grain-canvas" id="grainCanvas"></canvas>
+<div class="grain-label-left">Signal</div>
+<div class="grain-label-right">50% grey</div>
+</div>
+
+<div class="below">
+<p class="sub">Grain & Grit Machine is a procedural grain renderer. Physically modelled from real emulsion science. Coming to your NLE as a plugin.</p>
+<form class="form-row" onsubmit="event.preventDefault()">
+<input type="email" placeholder="Your email" required>
+<button type="submit">Join waitlist</button>
+</form>
+<p class="note">Founding access · 2026</p>
+</div>
+</div>
+
+<script>
+const canvas = document.getElementById('grainCanvas');
+const ctx = canvas.getContext('2d');
+let w, h;
+function resize() {
+  const r = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  w = canvas.width = Math.floor(rect.width * r);
+  h = canvas.height = Math.floor(rect.height * r);
+}
+resize();
+window.addEventListener('resize', resize);
+function render() {
+  const img = ctx.createImageData(w, h);
+  const d = img.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const v = (Math.random() - 0.5) * 55;
+    const b = 128 + v;
+    d[i] = b * 0.95; d[i+1] = b * 0.91; d[i+2] = b * 0.83; d[i+3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+  requestAnimationFrame(render);
+}
+render();
+</script>
+</body>
+</html>

@@ -8,78 +8,102 @@
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{height:100%}
-body{background:#181614;color:#F2E8D5;font-family:'IBM Plex Mono',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;position:relative}
+body{background:#181614;color:#F2E8D5;font-family:'IBM Plex Mono',monospace;min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative}
 
-.corner{position:fixed;z-index:10;pointer-events:none}
-.corner svg{width:40px;height:40px}
-.c-tl{top:24px;left:24px}
-.c-tr{top:24px;right:24px;transform:scaleX(-1)}
-.c-bl{bottom:24px;left:24px;transform:scaleY(-1)}
-.c-br{bottom:24px;right:24px;transform:scale(-1)}
+#grainCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0.18}
 
-.top-line{position:fixed;top:28px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#38322B;z-index:10;pointer-events:none}
-.bottom-line{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#38322B;z-index:10;pointer-events:none}
+.corner{position:fixed;z-index:20;pointer-events:none}
+.corner svg{width:36px;height:36px}
+.c-tl{top:20px;left:20px}
+.c-tr{top:20px;right:20px;transform:scaleX(-1)}
+.c-bl{bottom:20px;left:20px;transform:scaleY(-1)}
+.c-br{bottom:20px;right:20px;transform:scale(-1)}
 
-.content{position:relative;z-index:5;display:flex;flex-direction:column;align-items:center;text-align:center;width:100%;padding:0 32px}
+.hud-bl{position:fixed;bottom:24px;left:68px;z-index:20;pointer-events:none;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#38322B}
+.hud-br{position:fixed;bottom:24px;right:68px;z-index:20;pointer-events:none;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#38322B}
 
-.above{margin-bottom:40px;opacity:0;animation:fadeIn 0.8s ease forwards;animation-delay:0.2s}
-.brand{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#504538;margin-bottom:16px}
-.title{font-family:'DM Mono',monospace;font-size:clamp(28px,6vw,72px);font-weight:500;letter-spacing:-1px;line-height:1.1}
-.title em{font-style:normal;color:#C8903A}
+.card{position:relative;z-index:10;width:100%;max-width:680px;background:rgba(31,28,25,0.92);border:1px solid #504538;margin:24px;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);opacity:0;animation:fadeIn 0.6s ease forwards;animation-delay:0.2s}
 
-.grain-box{width:min(85vw, 700px);height:100px;position:relative;margin-bottom:40px;opacity:0;animation:fadeIn 0.8s ease forwards;animation-delay:0.6s;border:1px solid #38322B}
-.grain-canvas{width:100%;height:100%;display:block}
-.grain-label-left{position:absolute;left:-28px;top:50%;transform:translateY(-50%) rotate(-90deg);font-size:7px;letter-spacing:2px;text-transform:uppercase;color:#504538;white-space:nowrap}
-.grain-label-right{position:absolute;right:-20px;top:50%;transform:translateY(-50%) rotate(90deg);font-size:7px;letter-spacing:2px;text-transform:uppercase;color:#504538;white-space:nowrap}
+.card-header{background:rgba(38,34,32,0.95);padding:16px 24px;border-bottom:1px solid #504538;display:flex;justify-content:space-between;align-items:center}
+.card-title{font-family:'DM Mono',monospace;font-size:16px;font-weight:500;letter-spacing:0.5px}
+.card-badge{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#C8903A}
 
-.below{opacity:0;animation:fadeIn 0.8s ease forwards;animation-delay:1.0s}
-.sub{font-size:13px;color:#8A7A6A;letter-spacing:0.5px;margin-bottom:32px;line-height:1.6;max-width:440px}
-.form-row{display:flex;gap:2px;justify-content:center;margin-bottom:12px}
-.form-row input[type="email"]{background:#1f1c19;border:1px solid #504538;color:#F2E8D5;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:1px;padding:14px 20px;width:300px;outline:none;transition:border-color 0.1s}
+.card-body{padding:28px 24px}
+
+.tagline{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:#504538;margin-bottom:14px}
+
+.headline{font-family:'DM Mono',monospace;font-size:clamp(22px,4.5vw,38px);font-weight:500;letter-spacing:-0.5px;line-height:1.15;margin-bottom:24px}
+.headline em{font-style:normal;color:#C8903A}
+
+.description{font-size:13px;line-height:1.75;color:#8A7A6A;margin-bottom:28px}
+.description strong{color:#F2E8D5;font-weight:400}
+
+.form-row{display:flex;gap:2px;margin-bottom:12px}
+.form-row input[type="email"]{background:rgba(38,34,32,0.8);border:1px solid #504538;color:#F2E8D5;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:1px;padding:14px 16px;flex:1;min-width:0;outline:none;transition:border-color 0.1s}
 .form-row input[type="email"]:focus{border-color:#C8903A}
 .form-row input[type="email"]::placeholder{color:#504538;font-size:10px;letter-spacing:2px;text-transform:uppercase}
-.form-row button{background:#C8903A;border:none;color:#181614;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;padding:14px 24px;cursor:pointer;font-weight:500;transition:background 0.1s}
+.form-row button{background:#C8903A;border:none;color:#181614;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;padding:14px 20px;cursor:pointer;font-weight:500;transition:background 0.1s;white-space:nowrap;flex-shrink:0}
 .form-row button:hover{background:#d9a44a}
-.note{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#38322B}
 
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.note{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#504538}
+
+.card-footer{padding:12px 24px;border-top:1px solid #38322B;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.status-badge{display:inline-flex;align-items:center;gap:7px;border:1px solid #C8903A;padding:4px 12px}
+.status-badge .dot{width:5px;height:5px;border-radius:50%;background:#C8903A}
+.status-badge span{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#C8903A}
+.card-footer-text{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#38322B}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:720px){
+  .card{margin:16px;max-width:none}
+  .hud-bl,.hud-br{display:none}
+  .corner svg{width:28px;height:28px}
+  .c-tl{top:14px;left:14px}.c-tr{top:14px;right:14px}.c-bl{bottom:14px;left:14px}.c-br{bottom:14px;right:14px}
+}
 
 @media(max-width:500px){
-.form-row{flex-direction:column;align-items:center}
-.form-row input[type="email"]{width:100%;max-width:300px}
-.grain-label-left,.grain-label-right{display:none}
+  .card-header{flex-direction:column;align-items:flex-start;gap:4px;padding:14px 18px}
+  .card-body{padding:22px 18px}
+  .card-footer{padding:12px 18px}
+  .form-row{flex-direction:column}
+  .form-row input[type="email"]{width:100%}
+  .form-row button{width:100%;padding:14px}
+  .headline{font-size:clamp(20px,6vw,32px)}
+  .description{font-size:12px}
 }
 </style>
 </head>
 <body>
 
-<div class="corner c-tl"><svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M 2 2 L 2 22" stroke="#F2E8D5" stroke-width="1" opacity="0.4"/><path d="M 2 2 L 22 2" stroke="#F2E8D5" stroke-width="1" opacity="0.4"/></svg></div>
-<div class="corner c-tr"><svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M 2 2 L 2 22" stroke="#F2E8D5" stroke-width="1" opacity="0.4"/><path d="M 2 2 L 22 2" stroke="#F2E8D5" stroke-width="1" opacity="0.4"/></svg></div>
-<div class="corner c-bl"><svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M 2 2 L 2 22" stroke="#F2E8D5" stroke-width="1" opacity="0.4"/><path d="M 2 2 L 22 2" stroke="#F2E8D5" stroke-width="1" opacity="0.4"/></svg></div>
-<div class="corner c-br"><svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M 2 2 L 2 22" stroke="#F2E8D5" stroke-width="1" opacity="0.4"/><path d="M 2 2 L 22 2" stroke="#F2E8D5" stroke-width="1" opacity="0.4"/></svg></div>
+<canvas id="grainCanvas"></canvas>
 
-<div class="top-line">Pixel Basement · Grain &amp; Grit Machine</div>
-<div class="bottom-line">filmgrainplugin.com</div>
+<div class="corner c-tl"><svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M 2 2 L 2 18" stroke="#F2E8D5" stroke-width="1" opacity="0.3"/><path d="M 2 2 L 18 2" stroke="#F2E8D5" stroke-width="1" opacity="0.3"/></svg></div>
+<div class="corner c-tr"><svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M 2 2 L 2 18" stroke="#F2E8D5" stroke-width="1" opacity="0.3"/><path d="M 2 2 L 18 2" stroke="#F2E8D5" stroke-width="1" opacity="0.3"/></svg></div>
+<div class="corner c-bl"><svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M 2 2 L 2 18" stroke="#F2E8D5" stroke-width="1" opacity="0.3"/><path d="M 2 2 L 18 2" stroke="#F2E8D5" stroke-width="1" opacity="0.3"/></svg></div>
+<div class="corner c-br"><svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M 2 2 L 2 18" stroke="#F2E8D5" stroke-width="1" opacity="0.3"/><path d="M 2 2 L 18 2" stroke="#F2E8D5" stroke-width="1" opacity="0.3"/></svg></div>
 
-<div class="content">
-<div class="above">
-<div class="brand">A precision instrument</div>
-<h1 class="title">Grain is not noise.<br>It is <em>texture.</em></h1>
+<div class="hud-bl">Pixel Basement · 2026</div>
+<div class="hud-br">filmgrainplugin.com</div>
+
+<div class="card">
+<div class="card-header">
+<div class="card-title">Grain &amp; Grit Machine</div>
+<div class="card-badge">A precision instrument</div>
 </div>
-
-<div class="grain-box">
-<canvas class="grain-canvas" id="grainCanvas"></canvas>
-<div class="grain-label-left">Signal</div>
-<div class="grain-label-right">50% grey</div>
-</div>
-
-<div class="below">
-<p class="sub">Grain & Grit Machine is a procedural grain renderer. Physically modelled from real emulsion science. Coming to your NLE as a plugin.</p>
+<div class="card-body">
+<div class="tagline">from Pixel Basement</div>
+<h1 class="headline">Grain is not noise.<br>It is <em>texture.</em></h1>
+<p class="description">Grain &amp; Grit Machine is a procedural grain renderer. Physically modelled from real emulsion science. Coming to your NLE as a plugin.</p>
 <form class="form-row" onsubmit="event.preventDefault()">
 <input type="email" placeholder="Your email" required>
 <button type="submit">Join waitlist</button>
 </form>
-<p class="note">Founding access · 2026</p>
+<p class="note">Early access coming soon</p>
+</div>
+<div class="card-footer">
+<div class="status-badge"><div class="dot"></div><span>Waitlist open</span></div>
+<div class="card-footer-text">Plugin + standalone</div>
 </div>
 </div>
 
@@ -88,10 +112,8 @@ const canvas = document.getElementById('grainCanvas');
 const ctx = canvas.getContext('2d');
 let w, h;
 function resize() {
-  const r = window.devicePixelRatio || 1;
-  const rect = canvas.getBoundingClientRect();
-  w = canvas.width = Math.floor(rect.width * r);
-  h = canvas.height = Math.floor(rect.height * r);
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
 }
 resize();
 window.addEventListener('resize', resize);
@@ -99,9 +121,9 @@ function render() {
   const img = ctx.createImageData(w, h);
   const d = img.data;
   for (let i = 0; i < d.length; i += 4) {
-    const v = (Math.random() - 0.5) * 55;
+    const v = (Math.random() - 0.5) * 80;
     const b = 128 + v;
-    d[i] = b * 0.95; d[i+1] = b * 0.91; d[i+2] = b * 0.83; d[i+3] = 255;
+    d[i] = b; d[i+1] = b; d[i+2] = b; d[i+3] = 255;
   }
   ctx.putImageData(img, 0, 0);
   requestAnimationFrame(render);
