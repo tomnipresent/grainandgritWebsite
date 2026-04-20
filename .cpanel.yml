@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/tomnipre/filmgrainplugin/public_html/
+    - /bin/cp -R index.html style.css assets $DEPLOYPATH
