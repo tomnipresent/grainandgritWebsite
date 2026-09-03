@@ -550,3 +550,13 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Waitlist success message (waitlist.js swaps the form for this) */
+.waitlist-success {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--amb);
+  padding: 14px 0;
+  text-align: center;
+}
