@@ -1,0 +1,449 @@
+/* ── GGM Pages — Shared styles for non-product pages ── */
+
+/* Reduced grain on content pages */
+body.page-content #grainCanvas {
+  opacity: 0.04;
+}
+
+/* Navigation bar — non-product pages only */
+.site-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+  border-bottom: 1px solid var(--l2);
+  position: relative;
+  z-index: 10;
+}
+
+.site-nav-brand {
+  font-family: var(--font-headline);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--paper);
+  text-decoration: none;
+  letter-spacing: -.3px;
+}
+
+.site-nav-brand:hover {
+  color: var(--amb);
+}
+
+.site-nav-links {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.site-nav-links a {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--tm);
+  text-decoration: none;
+  transition: color .1s linear;
+}
+
+.site-nav-links a:hover,
+.site-nav-links a.active {
+  color: var(--paper);
+}
+
+/* Companion dropdown */
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-dropdown-toggle {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--tm);
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  transition: color .1s linear;
+  padding: 0;
+}
+
+.nav-dropdown-toggle:hover,
+.nav-dropdown.open .nav-dropdown-toggle {
+  color: var(--paper);
+}
+
+.nav-dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: var(--sf);
+  border: 1px solid var(--l2);
+  padding: 6px 0;
+  min-width: 200px;
+  z-index: 20;
+}
+
+.nav-dropdown.open .nav-dropdown-menu {
+  display: block;
+}
+
+.nav-dropdown-menu a {
+  display: block;
+  padding: 8px 16px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--wg);
+  text-decoration: none;
+  text-transform: none;
+}
+
+.nav-dropdown-menu a:hover {
+  color: var(--paper);
+  background: var(--lift);
+}
+
+/* Persistent CTA banner — links back to product page */
+.cta-banner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 32px;
+  background: var(--sf);
+  border-bottom: 1px solid var(--l2);
+}
+
+.cta-banner-text {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--tm);
+}
+
+.cta-banner-link {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--amb);
+  text-decoration: none;
+  transition: color .1s linear;
+}
+
+.cta-banner-link:hover {
+  color: #f5be5e;
+}
+
+/* Page header — used on stock grid, field notes, companion pages */
+.page-header {
+  padding: clamp(40px, 6vw, 80px) 0 0;
+}
+
+.page-title {
+  font-family: var(--font-headline);
+  font-size: clamp(20px, 3vw, 32px);
+  font-weight: 500;
+  letter-spacing: -.5px;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.page-title em {
+  font-style: normal;
+  color: var(--amb);
+}
+
+.page-desc {
+  font-size: 13px;
+  color: var(--wg);
+  line-height: 1.7;
+  max-width: 560px;
+}
+
+/* Stock grid — larger cards for the index page */
+.stock-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+}
+
+.stock-grid .stock-card {
+  text-decoration: none;
+  color: inherit;
+  transition: border-color .1s linear;
+}
+
+.stock-grid .stock-card:hover {
+  border-color: var(--amb);
+}
+
+.stock-grid .stock-img {
+  aspect-ratio: 3/2;
+}
+
+.stock-grid .stock-body {
+  padding: 14px 16px;
+}
+
+.stock-grid .stock-name {
+  font-size: 14px;
+  margin-bottom: 3px;
+}
+
+.stock-grid .stock-char {
+  margin-top: 6px;
+}
+
+/* Stock detail page */
+.stock-detail-header {
+  padding: clamp(40px, 6vw, 80px) 0 0;
+}
+
+.stock-detail-name {
+  font-family: var(--font-headline);
+  font-size: clamp(24px, 4vw, 40px);
+  font-weight: 500;
+  letter-spacing: -1px;
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+.stock-detail-name em {
+  font-style: normal;
+  color: var(--amb);
+}
+
+.stock-detail-meta {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--tm);
+  margin-bottom: 24px;
+}
+
+.stock-provenance {
+  font-size: 13px;
+  color: var(--wg);
+  line-height: 1.75;
+  max-width: 640px;
+  margin-bottom: 32px;
+}
+
+.stock-params {
+  background: var(--sf);
+  border: 1px solid var(--l2);
+  padding: 20px 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 32px;
+}
+
+.stock-params-title {
+  grid-column: 1 / -1;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--tm);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--l2);
+}
+
+.stock-param {
+  font-size: 11px;
+  color: var(--wg);
+  display: flex;
+  justify-content: space-between;
+}
+
+.stock-param span:first-child {
+  color: var(--tm);
+}
+
+.stock-param-val {
+  font-family: var(--font-headline);
+  font-weight: 500;
+  color: var(--paper);
+}
+
+/* Back link */
+.back-link {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--tm);
+  text-decoration: none;
+  margin-bottom: 20px;
+  transition: color .1s linear;
+}
+
+.back-link:hover {
+  color: var(--amb);
+}
+
+/* Article list — field notes index */
+.article-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.article-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  background: var(--sf);
+  border: 1px solid var(--l2);
+  padding: 16px 20px;
+  text-decoration: none;
+  transition: border-color .1s linear;
+}
+
+.article-item:hover {
+  border-color: var(--amb);
+}
+
+.article-title {
+  font-family: var(--font-headline);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--paper);
+}
+
+.article-date {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--tm);
+  flex-shrink: 0;
+}
+
+/* Companion page sections */
+.companion-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  align-items: start;
+}
+
+.companion-info {
+  padding: 24px 0;
+}
+
+.companion-preview {
+  background: var(--sf);
+  border: 1px solid var(--l2);
+  padding: 4px;
+}
+
+.companion-preview img {
+  width: 100%;
+  display: block;
+}
+
+.companion-tag {
+  display: inline-block;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--amb);
+  border: 1px solid var(--adim);
+  padding: 4px 10px;
+  margin-top: 12px;
+}
+
+/* Overlay contact sheet grid */
+.overlay-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+}
+
+.overlay-cell {
+  background: var(--sf);
+  border: 1px solid var(--l2);
+  padding: 12px;
+  text-align: center;
+}
+
+.overlay-cell svg {
+  width: 100%;
+  height: auto;
+  opacity: 0.8;
+}
+
+.overlay-cell-name {
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--tm);
+  margin-top: 8px;
+}
+
+/* Category breakdown */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+}
+
+.category-card {
+  background: var(--sf);
+  border: 1px solid var(--l2);
+  padding: 16px;
+}
+
+.category-name {
+  font-family: var(--font-headline);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.category-count {
+  font-size: 10px;
+  color: var(--tm);
+}
+
+.category-desc {
+  font-size: 10px;
+  color: var(--wg);
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
+/* Responsive — pages */
+@media (max-width: 768px) {
+  .stock-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .companion-hero {
+    grid-template-columns: 1fr;
+  }
+  .overlay-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .category-grid {
+    grid-template-columns: 1fr;
+  }
+  .stock-params {
+    grid-template-columns: 1fr;
+  }
+  .site-nav-links {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 500px) {
+  .stock-grid {
+    grid-template-columns: 1fr;
+  }
+  .site-nav {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .article-item {
+    flex-direction: column;
+    gap: 4px;
+  }
+}

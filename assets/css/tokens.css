@@ -1,0 +1,41 @@
+/* ── GGM Design Tokens ── */
+:root {
+  /* Core palette */
+  --dk: #090A0A;
+  --sf: #191D1B;
+  --lift: #232826;
+  --mid: #434D49;
+  --amb: #EDAE49;
+  --safe: #8B2E1A;
+  --paper: #F2E8D5;
+  --wg: #868686;
+
+  /* Extended */
+  --adim: #A17221;
+  --aglow: rgba(237, 174, 73, 0.09);
+  --preview-wrap: #101010;
+  --tm: #6C7370;
+  --tf: #3A322A;
+  --l2: #252A28;
+  --midtone-d: #54534E;
+
+  /* Semantic aliases */
+  --ggm-darkroom: var(--dk);
+  --ggm-surface: var(--sf);
+  --ggm-lift: var(--lift);
+  --ggm-midtone: var(--mid);
+  --ggm-amber: var(--amb);
+  --ggm-safelight: var(--safe);
+  --ggm-paper: var(--paper);
+  --ggm-warm-grey: var(--wg);
+
+  /* Typography */
+  --font-headline: 'DM Mono', monospace;
+  --font-body: 'IBM Plex Mono', monospace;
+
+  /* Spacing */
+  --sp-xl: clamp(80px, 12vw, 140px);
+  --sp-lg: clamp(60px, 8vw, 100px);
+  --sp-md: clamp(40px, 5vw, 64px);
+  --sp-sm: 24px;
+}

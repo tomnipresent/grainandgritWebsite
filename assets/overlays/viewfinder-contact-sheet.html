@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Viewfinder Overlay Pack — Contact Sheet</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{background:#181614;color:#F2E8D5;font-family:'IBM Plex Mono',monospace;min-height:100vh}
+.header{padding:40px 48px 0;display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
+.header-title{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;letter-spacing:0.5px}
+.header-meta{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#504538}
+.header-rule{margin:16px 48px 0;border:none;height:1px;background:#504538}
+.section-bar{padding:24px 48px 12px;display:flex;justify-content:space-between;align-items:baseline}
+.section-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#C8903A}
+.section-count{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#504538}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;padding:0 48px;margin-bottom:2px}
+.grid--wide{grid-template-columns:repeat(3,1fr)}
+.grid--pair{grid-template-columns:repeat(2,1fr)}
+.cell{position:relative;background:#1a1816;aspect-ratio:1;overflow:hidden;cursor:pointer;transition:outline 80ms linear;outline:1px solid transparent}
+.cell:hover{outline:1px solid #C8903A}
+.cell:hover .cell-label{color:#C8903A}
+.cell-inner{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.cell-inner svg{width:100%;height:100%;display:block}
+.cell-label{position:absolute;bottom:0;left:0;right:0;padding:8px 12px;background:linear-gradient(to top,rgba(24,22,20,0.9) 0%,rgba(24,22,20,0) 100%);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#8A7A6A;transition:color 80ms linear}
+.cell-number{position:absolute;top:10px;left:12px;font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:#504538}
+.section-divider{margin:0 48px;border:none;height:1px;background:#38322B}
+.footer{padding:24px 48px 40px;display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
+.footer-left{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#504538}
+.footer-right{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#38322B}
+.preview-overlay{display:none;position:fixed;inset:0;z-index:100;background:rgba(24,22,20,0.95);justify-content:center;align-items:center;cursor:pointer;flex-direction:column}
+.preview-overlay.active{display:flex}
+.preview-content{width:min(85vw,85vh);height:min(85vw,85vh)}
+.preview-content svg{width:100%;height:100%}
+.preview-label{margin-top:20px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#8A7A6A}
+</style>
+</head>
+<body>
+<div class="header">
+<div class="header-title">Viewfinder Overlay Pack</div>
+<div class="header-meta">18 assets · 1080×1080 · transparent · v1.0</div>
+</div>
+<hr class="header-rule">
+<div class="section-bar"><div class="section-label">Clean</div><div class="section-count">01–04 · 4 variants</div></div>
+<div class="grid" id="grid-clean"></div>
+<hr class="section-divider">
+<div class="section-bar"><div class="section-label">Cinema</div><div class="section-count">05–08 · 4 variants</div></div>
+<div class="grid" id="grid-cinema"></div>
+<hr class="section-divider">
+<div class="section-bar"><div class="section-label">Rangefinder / SLR</div><div class="section-count">09–11 · 3 variants</div></div>
+<div class="grid grid--wide" id="grid-rangefinder"></div>
+<hr class="section-divider">
+<div class="section-bar"><div class="section-label">Anamorphic</div><div class="section-count">12–14 · 3 variants</div></div>
+<div class="grid grid--wide" id="grid-anamorphic"></div>
+<hr class="section-divider">
+<div class="section-bar"><div class="section-label">Broadcast</div><div class="section-count">15–16 · 2 variants</div></div>
+<div class="grid grid--pair" id="grid-broadcast"></div>
+<hr class="section-divider">
+<div class="section-bar"><div class="section-label">Tactical</div><div class="section-count">17–18 · 2 variants</div></div>
+<div class="grid grid--pair" id="grid-tactical"></div>
+<hr class="section-divider">
+<div class="footer">
+<div class="footer-left">Grain &amp; Grit Machine · Pixel Basement · 2026</div>
+<div class="footer-right">Contact sheet · not for distribution</div>
+</div>
+<div class="preview-overlay" id="preview" onclick="this.classList.remove('active')">
+<div class="preview-content" id="preview-content"></div>
+<div class="preview-label" id="preview-label"></div>
+</div>
+<script>
+const assets = [{id:"01",name:"Minimal",section:"clean",svg:`<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+<g stroke="#F2E8D5" fill="none" opacity="0.85">
+<path d="M 80 80 L 80 160" stroke-width="2"/>
+<path d="M 80 80 L 160 80" stroke-width="2"/>
+<path d="M 1000 80 L 1000 160" stroke-width="2"/>
+<path d="M 1000 80 L 920 80" stroke-width="2"/>
+<path d="M 80 1000 L 80 920" stroke-width="2"/>
+<path d="M 80 1000 L 160 1000" stroke-width="2"/>
+<path d="M 1000 1000 L 1000 920" stroke-width="2"/>
+<path d="M 1000 1000 L 920 1000" stroke-width="2"/>
+</g>
+<line x1="530" y1="540" x2="550" y2="540" stroke="#F2E8D5" stroke-width="1" opacity="0.5"/>
+<line x1="540" y1="530" x2="540" y2="550" stroke="#F2E8D5" stroke-width="1" opacity="0.5"/>
+<circle cx="540" cy="540" r="2" fill="#F2E8D5" opacity="0.6"/>
+</svg>
+`},
+{id:"02",name:"Grid + Thirds",section:"clean",svg:`<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+<rect x="60" y="60" width="960" height="960" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.25"/>
+<g stroke="#F2E8D5" stroke-width="1.5" fill="none" opacity="0.7">
+<path d="M 60 60 L 60 110"/><path d="M 60 60 L 110 60"/>
+<path d="M 1020 60 L 1020 110"/><path d="M 1020 60 L 970 60"/>
+<path d="M 60 1020 L 60 970"/><path d="M 60 1020 L 110 1020"/>
+<path d="M 1020 1020 L 1020 970"/><path d="M 1020 1020 L 970 1020"/>
+</g>
+<g stroke="#F2E8D5" stroke-width="0.5" opacity="0.12">
+<line x1="380" y1="60" x2="380" y2="1020"/>
+<line x1="700" y1="60" x2="700" y2="1020"/>
+<line x1="60" y1="380" x2="1020" y2="380"/>
+<line x1="60" y1="700" x2="1020" y2="700"/>
+</g>
+<g stroke="#F2E8D5" stroke-width="0.5" opacity="0.15">
+<line x1="60" y1="540" x2="510" y2="540"/>
+<line x1="570" y1="540" x2="1020" y2="540"/>
+<line x1="540" y1="60" x2="540" y2="510"/>
+<line x1="540" y1="570" x2="540" y2="1020"/>
+</g>
+<circle cx="540" cy="540" r="3" fill="#F2E8D5" opacity="0.4"/>
+</svg>
+`},
+{id:"03",name:"Double Bracket",section:"clean",svg:`<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+<g stroke="#F2E8D5" stroke-width="2" fill="none" opacity="0.8">
+<path d="M 100 100 L 100 180"/><path d="M 100 100 L 180 100"/>
+<path d="M 980 100 L 980 180"/><path d="M 980 100 L 900 100"/>
+<path d="M 100 980 L 100 900"/><path d="M 100 980 L 180 980"/>
+<path d="M 980 980 L 980 900"/><path d="M 980 980 L 900 980"/>
+</g>
+<g stroke="#F2E8D5" stroke-width="0.5" fill="none" opacity="0.35">
+<path d="M 120 120 L 120 170"/><path d="M 120 120 L 170 120"/>
+<path d="M 960 120 L 960 170"/><path d="M 960 120 L 910 120"/>
+<path d="M 120 960 L 120 910"/><path d="M 120 960 L 170 960"/>
+<path d="M 960 960 L 960 910"/><path d="M 960 960 L 910 960"/>
+</g>
+<circle cx="540" cy="540" r="45" fill="none" stroke="#F2E8D5" stroke-width="1" opacity="0.35"/>
+<circle cx="540" cy="540" r="15" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.2" stroke-dasharray="2 3"/>
+<line x1="525" y1="540" x2="535" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.5"/>
+<line x1="545" y1="540" x2="555" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.5"/>
+<line x1="540" y1="525" x2="540" y2="535" stroke="#F2E8D5" stroke-width="0.5" opacity="0.5"/>
+<line x1="540" y1="545" x2="540" y2="555" stroke="#F2E8D5" stroke-width="0.5" opacity="0.5"/>
+<circle cx="540" cy="540" r="2" fill="#F2E8D5" opacity="0.5"/>
+</svg>
+`},
+{id:"04",name:"Edge Ticks",section:"clean",svg:`<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+<g stroke="#F2E8D5" stroke-width="1" opacity="0.5">
+<line x1="540" y1="40" x2="540" y2="70"/>
+<line x1="540" y1="1010" x2="540" y2="1040"/>
+<line x1="40" y1="540" x2="70" y2="540"/>
+<line x1="1010" y1="540" x2="1040" y2="540"/>
+</g>
+<g stroke="#F2E8D5" stroke-width="0.5" opacity="0.2">
+<line x1="360" y1="40" x2="360" y2="55"/>
+<line x1="720" y1="40" x2="720" y2="55"/>
+<line x1="360" y1="1025" x2="360" y2="1040"/>
+<line x1="720" y1="1025" x2="720" y2="1040"/>
+<line x1="40" y1="360" x2="55" y2="360"/>
+<line x1="40" y1="720" x2="55" y2="720"/>
+<line x1="1025" y1="360" x2="1040" y2="360"/>
+<line x1="1025" y1="720" x2="1040" y2="720"/>
+</g>
+<rect x="108" y="108" width="864" height="864" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.12" stroke-dasharray="6 6"/>
+<rect x="162" y="162" width="756" height="756" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.08" stroke-dasharray="4 8"/>
+<g stroke="#F2E8D5" stroke-width="0.5" fill="none" opacity="0.15">
+<line x1="108" y1="108" x2="108" y2="128"/><line x1="108" y1="108" x2="128" y2="108"/>
+<line x1="972" y1="108" x2="972" y2="128"/><line x1="972" y1="108" x2="952" y2="108"/>
+<line x1="108" y1="972" x2="108" y2="952"/><line x1="108" y1="972" x2="128" y2="972"/>
+<line x1="972" y1="972" x2="972" y2="952"/><line x1="972" y1="972" x2="952" y2="972"/>
+</g>
+<line x1="535" y1="540" x2="545" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.4"/>
+<line x1="540" y1="535" x2="540" y2="545" stroke="#F2E8D5" stroke-width="0.5" opacity="0.4"/>
+</svg>
+`},
+{id:"05",name:"ARRI-Style",section:"cinema",svg:`<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+<g stroke="#F2E8D5" stroke-width="1.5" fill="none" opacity="0.7">
+<path d="M 60 60 L 60 130"/><path d="M 60 60 L 130 60"/>
+<path d="M 1020 60 L 1020 130"/><path d="M 1020 60 L 950 60"/>
+<path d="M 60 1020 L 60 950"/><path d="M 60 1020 L 130 1020"/>
+<path d="M 1020 1020 L 1020 950"/><path d="M 1020 1020 L 950 1020"/>
+</g>
+<g stroke="#F2E8D5" stroke-width="0.5" opacity="0.1">
+<line x1="360" y1="60" x2="360" y2="1020"/>
+<line x1="720" y1="60" x2="720" y2="1020"/>
+<line x1="60" y1="360" x2="1020" y2="360"/>
+<line x1="60" y1="720" x2="1020" y2="720"/>
+</g>
+<rect x="130" y="130" width="820" height="820" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.08" stroke-dasharray="4 6"/>
+<line x1="530" y1="540" x2="550" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.4"/>
+<line x1="540" y1="530" x2="540" y2="550" stroke="#F2E8D5" stroke-width="0.5" opacity="0.4"/>
+<circle cx="540" cy="540" r="2" fill="#F2E8D5" opacity="0.35"/>
+<g font-family="'IBM Plex Mono', ui-monospace, monospace" opacity="0.65">
+<text x="80" y="50" fill="#F2E8D5" font-size="11" letter-spacing="1.5">REC ●</text>
+<text x="80" y="1052" fill="#F2E8D5" font-size="10" letter-spacing="1">S35  2.39:1  4K  24fps</text>
+<text x="1000" y="50" fill="#F2E8D5" font-size="10" letter-spacing="1" text-anchor="end">ISO 800  WB 5600K</text>
+<text x="1000" y="1052" fill="#F2E8D5" font-size="10" letter-spacing="1" text-anchor="end">TC 01:14:22:07</text>
+</g>
+<rect x="870" y="34" width="55" height="6" fill="#F2E8D5" opacity="0.3" rx="2"/>
+<text x="862" y="42" fill="#F2E8D5" font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="7" letter-spacing="1" text-anchor="end" opacity="0.4">BATT</text>
+</svg>
+`},
+{id:"06",name:"RED-Style",section:"cinema",svg:`<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+<rect x="40" y="40" width="1000" height="1000" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.15"/>
+<g stroke="#F2E8D5" stroke-width="1" fill="none" opacity="0.6">
+<path d="M 40 40 L 40 90"/><path d="M 40 40 L 90 40"/>
+<path d="M 1040 40 L 1040 90"/><path d="M 1040 40 L 990 40"/>
+<path d="M 40 1040 L 40 990"/><path d="M 40 1040 L 90 1040"/>
+<path d="M 1040 1040 L 1040 990"/><path d="M 1040 1040 L 990 1040"/>
+</g>
+<g stroke="#F2E8D5" stroke-width="0.5" opacity="0.08">
+<line x1="540" y1="40" x2="540" y2="1040"/>
+<line x1="40" y1="540" x2="1040" y2="540"/>
+</g>
+<circle cx="540" cy="540" r="35" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.25"/>
+<line x1="515" y1="540" x2="530" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.4"/>
+<line x1="550" y1="540" x2="565" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.4"/>
+<line x1="540" y1="515" x2="540" y2="530" stroke="#F2E8D5" stroke-width="0.5" opacity="0.4"/>
+<line x1="540" y1="550" x2="540" y2="565" stroke="#F2E8D5" stroke-width="0.5" opacity="0.4"/>
+<g font-family="'IBM Plex Mono', ui-monospace, monospace" opacity="0.6">
+<text x="56" y="32" fill="#F2E8D5" font-size="9" letter-spacing="1.5">DSMC3</text>
+<text x="56" y="56" fill="#F2E8D5" font-size="10" letter-spacing="1">8K FF  ·  R3D</text>
+<text x="56" y="72" fill="#F2E8D5" font-size="9" letter-spacing="1">IPP2  ·  REDWideGamut</text>
+<text x="1024" y="32" fill="#F2E8D5" font-size="9" letter-spacing="1" text-anchor="end">ISO 800</text>
+<text x="1024" y="48" fill="#F2E8D5" font-size="9" letter-spacing="1" text-anchor="end">WB 5200K  T+0.2</text>
+<text x="1024" y="64" fill="#F2E8D5" font-size="9" letter-spacing="1" text-anchor="end">1/48  f/2.8</text>
+<text x="56" y="1052" fill="#F2E8D5" font-size="9" letter-spacing="1">A001_C012.R3D</text>
+<text x="1024" y="1052" fill="#F2E8D5" font-size="10" letter-spacing="2" text-anchor="end">01:14:22:07</text>
+</g>
+<g fill="#F2E8D5" opacity="0.35">
+<rect x="56" y="1010" width="5" height="16"/>
+<rect x="65" y="1004" width="5" height="22"/>
+<rect x="74" y="1008" width="5" height="18"/>
+<rect x="83" y="1014" width="5" height="12"/>
+<rect x="92" y="1016" width="5" height="10"/>
+<rect x="101" y="1018" width="5" height="8"/>
+<rect x="113" y="1010" width="5" height="16"/>
+<rect x="122" y="1006" width="5" height="20"/>
+<rect x="131" y="1012" width="5" height="14"/>
+<rect x="140" y="1016" width="5" height="10"/>
+</g>
+<text x="56" y="1002" fill="#F2E8D5" font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="7" letter-spacing="1" opacity="0.35">AUDIO L/R</text>
+</svg>
+`},
+{id:"07",name:"Cinema Minimal",section:"cinema",svg:`<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+<g stroke="#F2E8D5" stroke-width="1" fill="none" opacity="0.55">
+<path d="M 50 120 L 50 170"/><path d="M 50 120 L 100 120"/>
+<path d="M 1030 120 L 1030 170"/><path d="M 1030 120 L 980 120"/>
+<path d="M 50 960 L 50 910"/><path d="M 50 960 L 100 960"/>
+<path d="M 1030 960 L 1030 910"/><path d="M 1030 960 L 980 960"/>
+</g>
+<line x1="50" y1="540" x2="70" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.2"/>
+<line x1="1010" y1="540" x2="1030" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.2"/>
+<line x1="540" y1="120" x2="540" y2="140" stroke="#F2E8D5" stroke-width="0.5" opacity="0.2"/>
+<line x1="540" y1="940" x2="540" y2="960" stroke="#F2E8D5" stroke-width="0.5" opacity="0.2"/>
+<line x1="535" y1="540" x2="545" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.3"/>
+<line x1="540" y1="535" x2="540" y2="545" stroke="#F2E8D5" stroke-width="0.5" opacity="0.3"/>
+<g font-family="'IBM Plex Mono', ui-monospace, monospace" fill="#F2E8D5" opacity="0.5">
+<text x="540" y="88" font-size="10" letter-spacing="1.5" text-anchor="middle">REEL 04  ·  SC 12  ·  TK 03</text>
+<text x="50" y="1000" font-size="14" letter-spacing="2">01:14:22:07</text>
+<text x="1030" y="1000" font-size="10" letter-spacing="1" text-anchor="end">24fps  ·  S35  ·  4-PERF</text>
+</g>
+<g stroke="#F2E8D5" stroke-width="0.5" opacity="0.06">
+<line x1="50" y1="315" x2="1030" y2="315"/>
+<line x1="50" y1="765" x2="1030" y2="765"/>
+</g>
+<text x="1030" y="310" fill="#F2E8D5" font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="7" letter-spacing="1" text-anchor="end" opacity="0.2">1.85:1</text>
+</svg>
+`},
+{id:"08",name:"Cinema Dense",section:"cinema",svg:`<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+<g stroke="#F2E8D5" stroke-width="1.5" fill="none" opacity="0.65">
+<path d="M 70 70 L 70 150"/><path d="M 70 70 L 150 70"/>
+<path d="M 1010 70 L 1010 150"/><path d="M 1010 70 L 930 70"/>
+<path d="M 70 1010 L 70 930"/><path d="M 70 1010 L 150 1010"/>
+<path d="M 1010 1010 L 1010 930"/><path d="M 1010 1010 L 930 1010"/>
+</g>
+<rect x="160" y="160" width="760" height="760" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.06" stroke-dasharray="3 6"/>
+<g stroke="#F2E8D5" stroke-width="0.5" opacity="0.08">
+<line x1="360" y1="70" x2="360" y2="1010"/>
+<line x1="720" y1="70" x2="720" y2="1010"/>
+<line x1="70" y1="360" x2="1010" y2="360"/>
+<line x1="70" y1="720" x2="1010" y2="720"/>
+</g>
+<line x1="520" y1="540" x2="535" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.4"/>
+<line x1="545" y1="540" x2="560" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.4"/>
+<line x1="540" y1="520" x2="540" y2="535" stroke="#F2E8D5" stroke-width="0.5" opacity="0.4"/>
+<line x1="540" y1="545" x2="540" y2="560" stroke="#F2E8D5" stroke-width="0.5" opacity="0.4"/>
+<circle cx="540" cy="540" r="25" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.2"/>
+<g font-family="'IBM Plex Mono', ui-monospace, monospace" fill="#F2E8D5" opacity="0.55">
+<text x="86" y="52" font-size="10" letter-spacing="1.5">● REC</text>
+<text x="86" y="66" font-size="9" letter-spacing="1">A024_C003_0415.ari</text>
+<text x="994" y="52" font-size="9" letter-spacing="1" text-anchor="end">ALEXA MINI LF  ·  ARRIRAW</text>
+<text x="994" y="66" font-size="9" letter-spacing="1" text-anchor="end">LF OG 4.5K  ·  23.976fps</text>
+<text x="86" y="1042" font-size="9" letter-spacing="1">ISO 800  ·  WB 5600K  ·  EI 800</text>
+<text x="540" y="1042" font-size="12" letter-spacing="2" text-anchor="middle">01:14:22:07</text>
+<text x="994" y="1042" font-size="9" letter-spacing="1" text-anchor="end">ZEISS SUPREME 35mm  ·  f/2.8  ·  3.2m</text>
+</g>
+<rect x="86" y="990" width="120" height="5" fill="#F2E8D5" opacity="0.2" rx="1"/>
+<rect x="86" y="990" width="90" height="5" fill="#F2E8D5" opacity="0.4" rx="1"/>
+<text x="86" y="986" fill="#F2E8D5" font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="7" letter-spacing="1" opacity="0.3">MEDIA  67%</text>
+<rect x="860" y="990" width="134" height="5" fill="#F2E8D5" opacity="0.2" rx="1"/>
+<rect x="860" y="990" width="108" height="5" fill="#F2E8D5" opacity="0.4" rx="1"/>
+<text x="994" y="986" fill="#F2E8D5" font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="7" letter-spacing="1" text-anchor="end" opacity="0.3">BATT  81%</text>
+</svg>
+`},
+{id:"09",name:"Rangefinder",section:"rangefinder",svg:`<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+<g stroke="#F2E8D5" stroke-width="1.5" fill="none" opacity="0.75">
+<path d="M 90 90 L 90 180"/><path d="M 90 90 L 180 90"/>
+<path d="M 990 90 L 990 180"/><path d="M 990 90 L 900 90"/>
+<path d="M 90 990 L 90 900"/><path d="M 90 990 L 180 990"/>
+<path d="M 990 990 L 990 900"/><path d="M 990 990 L 900 990"/>
+</g>
+<rect x="440" y="440" width="200" height="200" fill="none" stroke="#F2E8D5" stroke-width="1" opacity="0.5" rx="2"/>
+<line x1="90" y1="540" x2="440" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.1" stroke-dasharray="3 6"/>
+<line x1="640" y1="540" x2="990" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.1" stroke-dasharray="3 6"/>
+<line x1="540" y1="90" x2="540" y2="440" stroke="#F2E8D5" stroke-width="0.5" opacity="0.1" stroke-dasharray="3 6"/>
+<line x1="540" y1="640" x2="540" y2="990" stroke="#F2E8D5" stroke-width="0.5" opacity="0.1" stroke-dasharray="3 6"/>
+<line x1="530" y1="540" x2="550" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.5"/>
+<line x1="540" y1="530" x2="540" y2="550" stroke="#F2E8D5" stroke-width="0.5" opacity="0.5"/>
+<circle cx="540" cy="540" r="3" fill="#F2E8D5" opacity="0.4"/>
+<g font-family="'IBM Plex Mono', ui-monospace, monospace" fill="#F2E8D5" opacity="0.5">
+<text x="110" y="118" font-size="10" letter-spacing="1">1/60  f/1.4</text>
+<text x="970" y="118" font-size="10" letter-spacing="1" text-anchor="end">50mm</text>
+</g>
+<circle cx="120" cy="960" r="5" fill="#F2E8D5" opacity="0.4"/>
+<text x="134" y="965" fill="#F2E8D5" font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="8" letter-spacing="1" opacity="0.35">IN FOCUS</text>
+</svg>
+`},
+{id:"10",name:"SLR Split-Prism",section:"rangefinder",svg:`<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+<circle cx="540" cy="540" r="420" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.15"/>
+<circle cx="540" cy="540" r="160" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.25"/>
+<circle cx="540" cy="540" r="60" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.35"/>
+<circle cx="540" cy="540" r="25" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.15" stroke-dasharray="2 2"/>
+<line x1="540" y1="380" x2="540" y2="480" stroke="#F2E8D5" stroke-width="0.5" opacity="0.15"/>
+<line x1="540" y1="600" x2="540" y2="700" stroke="#F2E8D5" stroke-width="0.5" opacity="0.15"/>
+<line x1="380" y1="540" x2="480" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.15"/>
+<line x1="600" y1="540" x2="700" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.15"/>
+<line x1="540" y1="120" x2="540" y2="200" stroke="#F2E8D5" stroke-width="0.5" opacity="0.1"/>
+<line x1="540" y1="880" x2="540" y2="960" stroke="#F2E8D5" stroke-width="0.5" opacity="0.1"/>
+<line x1="120" y1="540" x2="200" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.1"/>
+<line x1="880" y1="540" x2="960" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.1"/>
+<line x1="535" y1="540" x2="545" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.5"/>
+<line x1="540" y1="535" x2="540" y2="545" stroke="#F2E8D5" stroke-width="0.5" opacity="0.5"/>
+<circle cx="540" cy="540" r="2" fill="#F2E8D5" opacity="0.5"/>
+<text x="540" y="108" fill="#F2E8D5" font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="8" letter-spacing="1.5" text-anchor="middle" opacity="0.35">MICROPRISM COLLAR</text>
+<g transform="translate(870, 925)" opacity="0.4">
+<rect width="10" height="10" fill="none" stroke="#F2E8D5" stroke-width="0.5"/>
+<rect width="10" height="10" fill="none" stroke="#F2E8D5" stroke-width="0.5" x="14"/>
+<rect width="10" height="10" fill="none" stroke="#F2E8D5" stroke-width="0.5" x="28"/>
+<rect width="10" height="10" fill="none" stroke="#F2E8D5" stroke-width="0.5" x="42"/>
+<rect width="10" height="10" fill="#F2E8D5" x="56"/>
+<rect width="10" height="10" fill="#F2E8D5" x="70"/>
+</g>
+<text x="860" y="953" fill="#F2E8D5" font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="7" letter-spacing="1" opacity="0.3">METER ▸ +0.7</text>
+</svg>
+`},
+{id:"11",name:"Medium Format",section:"rangefinder",svg:`<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+<rect x="120" y="120" width="840" height="840" fill="none" stroke="#F2E8D5" stroke-width="1" opacity="0.5"/>
+<rect x="150" y="150" width="780" height="780" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.15"/>
+<g stroke="#F2E8D5" stroke-width="0.5" opacity="0.12">
+<line x1="120" y1="540" x2="960" y2="540"/>
+<line x1="540" y1="120" x2="540" y2="960"/>
+</g>
+<g stroke="#F2E8D5" stroke-width="0.5" opacity="0.2">
+<line x1="120" y1="120" x2="140" y2="120"/><line x1="120" y1="120" x2="120" y2="140"/>
+<line x1="960" y1="120" x2="940" y2="120"/><line x1="960" y1="120" x2="960" y2="140"/>
+<line x1="120" y1="960" x2="140" y2="960"/><line x1="120" y1="960" x2="120" y2="940"/>
+<line x1="960" y1="960" x2="940" y2="960"/><line x1="960" y1="960" x2="960" y2="940"/>
+</g>
+<g stroke="#F2E8D5" stroke-width="0.5" opacity="0.25" stroke-dasharray="4 4">
+<path d="M 135 135 L 135 155"/><path d="M 135 135 L 155 135"/>
+<path d="M 945 135 L 945 155"/><path d="M 945 135 L 925 135"/>
+</g>
+<text x="168" y="148" fill="#F2E8D5" font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="7" letter-spacing="1" opacity="0.25">PARALLAX 1m</text>
+<line x1="534" y1="540" x2="546" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.4"/>
+<line x1="540" y1="534" x2="540" y2="546" stroke="#F2E8D5" stroke-width="0.5" opacity="0.4"/>
+<circle cx="540" cy="540" r="40" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.12"/>
+<g font-family="'IBM Plex Mono', ui-monospace, monospace" fill="#F2E8D5" opacity="0.4">
+<text x="540" y="108" font-size="9" letter-spacing="2" text-anchor="middle">6×6  ·  120 FILM</text>
+<text x="540" y="988" font-size="9" letter-spacing="2" text-anchor="middle">HASSELBLAD 500C  ·  80mm  ·  f/2.8</text>
+</g>
+<g font-family="'IBM Plex Mono', ui-monospace, monospace" fill="#F2E8D5" opacity="0.25" font-size="8" letter-spacing="1">
+<text x="108" y="540" text-anchor="end" transform="rotate(-90, 108, 540)">FRAME 7 / 12</text>
+</g>
+</svg>
+`},
+{id:"12",name:"2.39:1 Scope",section:"anamorphic",svg:`<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+<rect x="0" y="0" width="1080" height="88" fill="#000000" opacity="0.85"/>
+<rect x="0" y="992" width="1080" height="88" fill="#000000" opacity="0.85"/>
+<g stroke="#F2E8D5" stroke-width="1.5" fill="none" opacity="0.6">
+<path d="M 40 100 L 40 155"/><path d="M 40 100 L 95 100"/>
+<path d="M 1040 100 L 1040 155"/><path d="M 1040 100 L 985 100"/>
+<path d="M 40 980 L 40 925"/><path d="M 40 980 L 95 980"/>
+<path d="M 1040 980 L 1040 925"/><path d="M 1040 980 L 985 980"/>
+</g>
+<g stroke="#F2E8D5" stroke-width="0.5" opacity="0.08">
+<line x1="360" y1="88" x2="360" y2="992"/>
+<line x1="720" y1="88" x2="720" y2="992"/>
+<line x1="40" y1="540" x2="1040" y2="540"/>
+</g>
+<line x1="525" y1="540" x2="555" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.3"/>
+<line x1="540" y1="525" x2="540" y2="555" stroke="#F2E8D5" stroke-width="0.5" opacity="0.3"/>
+<circle cx="540" cy="540" r="30" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.15"/>
+<circle cx="540" cy="540" r="2" fill="#F2E8D5" opacity="0.4"/>
+<g font-family="'IBM Plex Mono', ui-monospace, monospace" fill="#F2E8D5" opacity="0.45">
+<text x="50" y="58" font-size="10" letter-spacing="1.5">2× ANAMORPHIC  ·  SCOPE  ·  2.39:1</text>
+<text x="1030" y="58" font-size="10" letter-spacing="1" text-anchor="end">4-PERF 35mm</text>
+<text x="50" y="1042" font-size="10" letter-spacing="1">REEL 04  ·  SC 12  ·  TK 03</text>
+<text x="1030" y="1042" font-size="12" letter-spacing="2" text-anchor="end">01:14:22:07</text>
+</g>
+</svg>
+`},
+{id:"13",name:"Panavision",section:"anamorphic",svg:`<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+<rect x="0" y="0" width="1080" height="100" fill="#000000" opacity="0.8"/>
+<rect x="0" y="980" width="1080" height="100" fill="#000000" opacity="0.8"/>
+<rect x="30" y="100" width="1020" height="880" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.2"/>
+<g stroke="#F2E8D5" stroke-width="1" fill="none" opacity="0.5">
+<path d="M 30 100 L 30 160"/><path d="M 30 100 L 90 100"/>
+<path d="M 1050 100 L 1050 160"/><path d="M 1050 100 L 990 100"/>
+<path d="M 30 980 L 30 920"/><path d="M 30 980 L 90 980"/>
+<path d="M 1050 980 L 1050 920"/><path d="M 1050 980 L 990 980"/>
+</g>
+<rect x="130" y="200" width="820" height="680" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.06" stroke-dasharray="5 5"/>
+<g stroke="#F2E8D5" stroke-width="0.5" opacity="0.06">
+<line x1="30" y1="540" x2="520" y2="540"/>
+<line x1="560" y1="540" x2="1050" y2="540"/>
+<line x1="540" y1="100" x2="540" y2="520"/>
+<line x1="540" y1="560" x2="540" y2="980"/>
+</g>
+<line x1="530" y1="540" x2="550" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.35"/>
+<line x1="540" y1="530" x2="540" y2="550" stroke="#F2E8D5" stroke-width="0.5" opacity="0.35"/>
+<circle cx="540" cy="540" r="2" fill="#F2E8D5" opacity="0.3"/>
+<g font-family="'IBM Plex Mono', ui-monospace, monospace" fill="#F2E8D5" opacity="0.4">
+<text x="50" y="55" font-size="9" letter-spacing="1.5">PANAVISION C-SERIES  ·  40mm  ·  2× ANAMORPHIC</text>
+<text x="1030" y="55" font-size="9" letter-spacing="1" text-anchor="end">1/48  ·  f/2.8  ·  T 3.1</text>
+<text x="50" y="75" font-size="8" letter-spacing="1">FOCUS: 2.4m  ·  NEAR: 1.8m  ·  FAR: 3.6m</text>
+<text x="50" y="1040" font-size="9" letter-spacing="1">500T  ·  EI 500  ·  ECN-2</text>
+<text x="540" y="1040" font-size="12" letter-spacing="2" text-anchor="middle">01:14:22:07</text>
+<text x="1030" y="1040" font-size="9" letter-spacing="1" text-anchor="end">CAM A  ·  MAG 04</text>
+</g>
+</svg>
+`},
+{id:"14",name:"Ultra 70mm",section:"anamorphic",svg:`<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+<rect x="0" y="0" width="1080" height="148" fill="#000000" opacity="0.85"/>
+<rect x="0" y="932" width="1080" height="148" fill="#000000" opacity="0.85"/>
+<g stroke="#F2E8D5" stroke-width="0.5" fill="none" opacity="0.35">
+<path d="M 20 155 L 20 195"/><path d="M 20 155 L 60 155"/>
+<path d="M 1060 155 L 1060 195"/><path d="M 1060 155 L 1020 155"/>
+<path d="M 20 925 L 20 885"/><path d="M 20 925 L 60 925"/>
+<path d="M 1060 925 L 1060 885"/><path d="M 1060 925 L 1020 925"/>
+</g>
+<line x1="530" y1="540" x2="550" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.25"/>
+<line x1="540" y1="530" x2="540" y2="550" stroke="#F2E8D5" stroke-width="0.5" opacity="0.25"/>
+<g font-family="'IBM Plex Mono', ui-monospace, monospace" fill="#F2E8D5" opacity="0.3">
+<text x="40" y="80" font-size="9" letter-spacing="1.5">ULTRA PANAVISION 70  ·  2.76:1  ·  65mm</text>
+<text x="1040" y="80" font-size="9" letter-spacing="1" text-anchor="end">5-PERF  ·  SPHERICAL PRINT</text>
+<text x="40" y="1010" font-size="9" letter-spacing="1">REEL 07  ·  2000ft</text>
+<text x="1040" y="1010" font-size="14" letter-spacing="2" text-anchor="end">01:42:08:16</text>
+</g>
+<g stroke="#F2E8D5" stroke-width="0.5" opacity="0.06">
+<line x1="360" y1="148" x2="360" y2="932"/>
+<line x1="720" y1="148" x2="720" y2="932"/>
+</g>
+</svg>
+`},
+{id:"15",name:"SDI Monitor",section:"broadcast",svg:`<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+<rect x="54" y="54" width="972" height="972" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.1"/>
+<rect x="108" y="108" width="864" height="864" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.06" stroke-dasharray="4 6"/>
+<g stroke="#F2E8D5" stroke-width="0.5" fill="none" opacity="0.12">
+<line x1="54" y1="54" x2="54" y2="74"/><line x1="54" y1="54" x2="74" y2="54"/>
+<line x1="1026" y1="54" x2="1026" y2="74"/><line x1="1026" y1="54" x2="1006" y2="54"/>
+<line x1="54" y1="1026" x2="54" y2="1006"/><line x1="54" y1="1026" x2="74" y2="1026"/>
+<line x1="1026" y1="1026" x2="1026" y2="1006"/><line x1="1026" y1="1026" x2="1006" y2="1026"/>
+</g>
+<g stroke="#F2E8D5" stroke-width="0.5" fill="none" opacity="0.06">
+<line x1="108" y1="108" x2="108" y2="120"/><line x1="108" y1="108" x2="120" y2="108"/>
+<line x1="972" y1="108" x2="972" y2="120"/><line x1="972" y1="108" x2="960" y2="108"/>
+<line x1="108" y1="972" x2="108" y2="960"/><line x1="108" y1="972" x2="120" y2="972"/>
+<line x1="972" y1="972" x2="972" y2="960"/><line x1="972" y1="972" x2="960" y2="972"/>
+</g>
+<line x1="536" y1="540" x2="544" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.3"/>
+<line x1="540" y1="536" x2="540" y2="544" stroke="#F2E8D5" stroke-width="0.5" opacity="0.3"/>
+<g font-family="'IBM Plex Mono', ui-monospace, monospace" fill="#F2E8D5" opacity="0.4">
+<text x="65" y="42" font-size="9" letter-spacing="1">SDI 1  ·  1920×1080  ·  23.976p</text>
+<text x="1015" y="42" font-size="9" letter-spacing="1" text-anchor="end">BT.709  ·  10-BIT  ·  4:2:2</text>
+<text x="65" y="1058" font-size="9" letter-spacing="1">TALLY ●  ·  PGM</text>
+<text x="540" y="1058" font-size="11" letter-spacing="2" text-anchor="middle">01:14:22:07</text>
+<text x="1015" y="1058" font-size="9" letter-spacing="1" text-anchor="end">VITC  ·  NDF</text>
+</g>
+<text x="118" y="100" fill="#F2E8D5" font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="7" letter-spacing="1" opacity="0.2">SAFE ACTION 90%</text>
+<text x="118" y="122" fill="#F2E8D5" font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="7" letter-spacing="1" opacity="0.15">SAFE TITLE 80%</text>
+<g transform="translate(980, 120)" fill="#F2E8D5" opacity="0.3">
+<rect width="6" height="60" y="80" x="0"/><rect width="6" height="90" y="50" x="10"/>
+<rect width="6" height="70" y="70" x="20"/><rect width="6" height="50" y="90" x="30"/>
+<rect width="6" height="30" y="110" x="40"/>
+<rect width="6" height="55" y="85" x="56"/><rect width="6" height="85" y="55" x="66"/>
+<rect width="6" height="65" y="75" x="76"/><rect width="6" height="45" y="95" x="86"/>
+<rect width="6" height="25" y="115" x="96"/>
+</g>
+<text x="980" y="270" fill="#F2E8D5" font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="7" letter-spacing="1" opacity="0.2">L</text>
+<text x="1036" y="270" fill="#F2E8D5" font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="7" letter-spacing="1" opacity="0.2">R</text>
+</svg>
+`},
+{id:"16",name:"Director Monitor",section:"broadcast",svg:`<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+<rect x="30" y="70" width="1020" height="940" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.12"/>
+<rect x="30" y="30" width="1020" height="40" fill="#F2E8D5" fill-opacity="0.06"/>
+<line x1="30" y1="70" x2="1050" y2="70" stroke="#F2E8D5" stroke-width="0.5" opacity="0.15"/>
+<g font-family="'IBM Plex Mono', ui-monospace, monospace" fill="#F2E8D5">
+<text x="48" y="56" font-size="14" letter-spacing="3" font-weight="500" opacity="0.6">CAM A</text>
+<text x="160" y="56" font-size="9" letter-spacing="1" opacity="0.3">ALEXA MINI LF  ·  LOG C3  ·  4.5K</text>
+<text x="1032" y="56" font-size="9" letter-spacing="1" text-anchor="end" opacity="0.3">LIVE</text>
+</g>
+<circle cx="1004" cy="50" r="5" fill="#F2E8D5" opacity="0.5"/>
+<g stroke="#F2E8D5" stroke-width="0.5" fill="none" opacity="0.08">
+<line x1="360" y1="70" x2="360" y2="1010"/>
+<line x1="720" y1="70" x2="720" y2="1010"/>
+<line x1="30" y1="380" x2="1050" y2="380"/>
+<line x1="30" y1="700" x2="1050" y2="700"/>
+</g>
+<line x1="535" y1="540" x2="545" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.3"/>
+<line x1="540" y1="535" x2="540" y2="545" stroke="#F2E8D5" stroke-width="0.5" opacity="0.3"/>
+<g font-family="'IBM Plex Mono', ui-monospace, monospace" fill="#F2E8D5" opacity="0.35">
+<text x="48" y="1035" font-size="11" letter-spacing="2">01:14:22:07</text>
+<text x="300" y="1035" font-size="9" letter-spacing="1">REC TC</text>
+<text x="540" y="1035" font-size="9" letter-spacing="1" text-anchor="middle">SC 12  TK 03</text>
+<text x="1032" y="1035" font-size="9" letter-spacing="1" text-anchor="end">ISO 800  ·  WB 5600K</text>
+</g>
+<rect x="48" y="980" width="100" height="4" fill="#F2E8D5" opacity="0.2" rx="1"/>
+<rect x="48" y="980" width="67" height="4" fill="#F2E8D5" opacity="0.4" rx="1"/>
+<text x="48" y="976" fill="#F2E8D5" font-family="'IBM Plex Mono', ui-monospace, monospace" font-size="7" letter-spacing="1" opacity="0.2">MEDIA</text>
+</svg>
+`},
+{id:"17",name:"Mil-Dot",section:"tactical",svg:`<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+<circle cx="540" cy="540" r="440" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.1"/>
+<circle cx="540" cy="540" r="300" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.08"/>
+<circle cx="540" cy="540" r="160" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.06"/>
+<line x1="100" y1="540" x2="490" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.35"/>
+<line x1="590" y1="540" x2="980" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.35"/>
+<line x1="540" y1="100" x2="540" y2="490" stroke="#F2E8D5" stroke-width="0.5" opacity="0.35"/>
+<line x1="540" y1="590" x2="540" y2="980" stroke="#F2E8D5" stroke-width="0.5" opacity="0.35"/>
+<g fill="#F2E8D5" opacity="0.5">
+<circle cx="490" cy="540" r="2"/><circle cx="440" cy="540" r="2"/><circle cx="390" cy="540" r="2"/><circle cx="340" cy="540" r="2"/>
+<circle cx="290" cy="540" r="2"/><circle cx="240" cy="540" r="2"/>
+<circle cx="590" cy="540" r="2"/><circle cx="640" cy="540" r="2"/><circle cx="690" cy="540" r="2"/><circle cx="740" cy="540" r="2"/>
+<circle cx="790" cy="540" r="2"/><circle cx="840" cy="540" r="2"/>
+<circle cx="540" cy="490" r="2"/><circle cx="540" cy="440" r="2"/><circle cx="540" cy="390" r="2"/><circle cx="540" cy="340" r="2"/>
+<circle cx="540" cy="590" r="2"/><circle cx="540" cy="640" r="2"/><circle cx="540" cy="690" r="2"/><circle cx="540" cy="740" r="2"/>
+</g>
+<g stroke="#F2E8D5" stroke-width="0.5" opacity="0.2">
+<line x1="490" y1="535" x2="490" y2="545"/>
+<line x1="390" y1="535" x2="390" y2="545"/>
+<line x1="290" y1="535" x2="290" y2="545"/>
+<line x1="590" y1="535" x2="590" y2="545"/>
+<line x1="690" y1="535" x2="690" y2="545"/>
+<line x1="790" y1="535" x2="790" y2="545"/>
+<line x1="535" y1="490" x2="545" y2="490"/>
+<line x1="535" y1="390" x2="545" y2="390"/>
+<line x1="535" y1="590" x2="545" y2="590"/>
+<line x1="535" y1="690" x2="545" y2="690"/>
+</g>
+<g font-family="'IBM Plex Mono', ui-monospace, monospace" fill="#F2E8D5" opacity="0.2" font-size="7" letter-spacing="1">
+<text x="490" y="558">1</text><text x="390" y="558">2</text><text x="290" y="558">3</text>
+<text x="590" y="558">1</text><text x="690" y="558">2</text><text x="790" y="558">3</text>
+</g>
+<line x1="540" y1="505" x2="540" y2="530" stroke="#F2E8D5" stroke-width="0.5" opacity="0.5"/>
+<line x1="540" y1="550" x2="540" y2="575" stroke="#F2E8D5" stroke-width="0.5" opacity="0.5"/>
+<line x1="505" y1="540" x2="530" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.5"/>
+<line x1="550" y1="540" x2="575" y2="540" stroke="#F2E8D5" stroke-width="0.5" opacity="0.5"/>
+<circle cx="540" cy="540" r="2" fill="#F2E8D5" opacity="0.5"/>
+<g font-family="'IBM Plex Mono', ui-monospace, monospace" fill="#F2E8D5" opacity="0.25">
+<text x="108" y="130" font-size="8" letter-spacing="1.5">MIL-DOT  ·  FFP</text>
+<text x="972" y="130" font-size="8" letter-spacing="1.5" text-anchor="end">10× MAGNIFICATION</text>
+<text x="108" y="960" font-size="8" letter-spacing="1.5">ELEVATION ▲ 4.2</text>
+<text x="972" y="960" font-size="8" letter-spacing="1.5" text-anchor="end">WINDAGE ▸ 1.8</text>
+</g>
+</svg>
+`},
+{id:"18",name:"BDC Reticle",section:"tactical",svg:`<svg width="1080" height="1080" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+<circle cx="540" cy="540" r="460" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.08"/>
+<g stroke="#F2E8D5" stroke-width="0.5" opacity="0.3">
+<line x1="80" y1="540" x2="500" y2="540"/>
+<line x1="580" y1="540" x2="1000" y2="540"/>
+<line x1="540" y1="80" x2="540" y2="500"/>
+<line x1="540" y1="580" x2="540" y2="1000"/>
+</g>
+<g stroke="#F2E8D5" stroke-width="0.5" opacity="0.2">
+<line x1="540" y1="620" x2="540" y2="640"/>
+<line x1="530" y1="630" x2="550" y2="630"/>
+<line x1="540" y1="670" x2="540" y2="690"/>
+<line x1="525" y1="680" x2="555" y2="680"/>
+<line x1="540" y1="720" x2="540" y2="740"/>
+<line x1="520" y1="730" x2="560" y2="730"/>
+<line x1="540" y1="770" x2="540" y2="790"/>
+<line x1="515" y1="780" x2="565" y2="780"/>
+<line x1="540" y1="820" x2="540" y2="840"/>
+<line x1="510" y1="830" x2="570" y2="830"/>
+</g>
+<g font-family="'IBM Plex Mono', ui-monospace, monospace" fill="#F2E8D5" font-size="7" opacity="0.15">
+<text x="572" y="634">100</text>
+<text x="572" y="684">200</text>
+<text x="572" y="734">300</text>
+<text x="572" y="784">400</text>
+<text x="572" y="834">500</text>
+</g>
+<circle cx="540" cy="540" r="40" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.15"/>
+<circle cx="540" cy="540" r="20" fill="none" stroke="#F2E8D5" stroke-width="0.5" opacity="0.1"/>
+<g stroke="#F2E8D5" stroke-width="0.5" opacity="0.5">
+<line x1="520" y1="540" x2="532" y2="540"/>
+<line x1="548" y1="540" x2="560" y2="540"/>
+<line x1="540" y1="520" x2="540" y2="532"/>
+<line x1="540" y1="548" x2="540" y2="560"/>
+</g>
+<circle cx="540" cy="540" r="1.5" fill="#F2E8D5" opacity="0.6"/>
+<g stroke="#F2E8D5" stroke-width="0.5" opacity="0.15">
+<line x1="160" y1="535" x2="160" y2="545"/>
+<line x1="240" y1="535" x2="240" y2="545"/>
+<line x1="320" y1="535" x2="320" y2="545"/>
+<line x1="400" y1="533" x2="400" y2="547"/>
+<line x1="680" y1="533" x2="680" y2="547"/>
+<line x1="760" y1="535" x2="760" y2="545"/>
+<line x1="840" y1="535" x2="840" y2="545"/>
+<line x1="920" y1="535" x2="920" y2="545"/>
+</g>
+<g stroke="#F2E8D5" stroke-width="0.5" opacity="0.15">
+<line x1="535" y1="160" x2="545" y2="160"/>
+<line x1="535" y1="240" x2="545" y2="240"/>
+<line x1="535" y1="320" x2="545" y2="320"/>
+<line x1="533" y1="400" x2="547" y2="400"/>
+</g>
+<g font-family="'IBM Plex Mono', ui-monospace, monospace" fill="#F2E8D5" opacity="0.2">
+<text x="120" y="120" font-size="8" letter-spacing="1.5">BDC RETICLE  ·  MOA</text>
+<text x="960" y="120" font-size="8" letter-spacing="1.5" text-anchor="end">PARALLAX 100m</text>
+<text x="540" y="1000" font-size="8" letter-spacing="1.5" text-anchor="middle">HASHMARKS CALIBRATED  ·  .308 WIN 168gr</text>
+</g>
+</svg>
+`}];
+assets.forEach(a => {
+  const grid = document.getElementById('grid-' + a.section);
+  if (!grid) return;
+  const cell = document.createElement('div');
+  cell.className = 'cell';
+  cell.innerHTML = '<div class="cell-number">' + a.id + '</div><div class="cell-inner">' + a.svg + '</div><div class="cell-label">' + a.name + '</div>';
+  cell.addEventListener('click', () => {
+    document.getElementById('preview-content').innerHTML = a.svg;
+    document.getElementById('preview-label').textContent = a.id + ' — ' + a.name;
+    document.getElementById('preview').classList.add('active');
+  });
+  grid.appendChild(cell);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.getElementById('preview').classList.remove('active'); });
+</script>
+</body>
+</html>
